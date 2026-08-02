@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: madre_tierra_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: madre_tierra_user
+      POSTGRES_PASSWORD: 1304
+      POSTGRES_DB: madre_tierra_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U madre_tierra_user -d madre_tierra_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
