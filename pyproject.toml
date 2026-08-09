@@ -5,15 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "fastapi>=0.141.1",
     "phonenumbers>=9.0.36",
     "pydantic-extra-types>=2.11.1",
     "pydantic[email]>=2.13.4",
     "sqlmodel>=0.0.39",
+    "uvicorn>=0.52.1",
 ]
 
-[project.scripts]
-inventory-system = "inventory_system:main"
-
-[build-system]
-requires = ["uv_build>=0.12.1,<0.13.0"]
-build-backend = "uv_build"
+[tool.uv]
+package = false
