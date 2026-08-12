@@ -32,3 +32,6 @@ class ClientUpdate(ClientBase):
 class ClientLogin(SQLModel):
     email: str
     password: str
+
+class ClientDelete(SQLModel):
+    id: int

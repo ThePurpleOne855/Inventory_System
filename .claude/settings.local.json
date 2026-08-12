@@ -4,7 +4,8 @@
       "Bash(uv --version)",
       "Bash(.venv/bin/python3 -m pip list)",
       "Bash(uv sync *)",
-      "Bash(.venv/bin/python3 -c \"import fastapi, uvicorn, sqlmodel, phonenumbers, pydantic_extra_types; print\\('imports OK'\\)\")"
+      "Bash(.venv/bin/python3 -c \"import fastapi, uvicorn, sqlmodel, phonenumbers, pydantic_extra_types; print\\('imports OK'\\)\")",
+      "Bash(rm *)"
     ]
   }
 }

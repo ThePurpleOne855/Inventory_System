@@ -1,5 +1,5 @@
-from fastapi import FastAPI, APIRouter
-from app.schema.client import ClientCreate, ClientRead, ClientUpdate 
+from fastapi import FastAPI, APIRouter, HTTPException
+from app.schema.client import ClientCreate, ClientDelete, ClientRead, ClientUpdate 
 
 
 app = FastAPI()
@@ -9,22 +9,22 @@ router = APIRouter(
     tags=["clients"]
 )
 
-@router.get("/")
+@router.get("/", response_model=list[ClientRead])
 def list_clients():
     pass
 
-@router.get("/{client_id}")
+@router.get("/{client_id}", response_model=ClientRead)
 def get_client(client_id: int):
     pass
 
-@router.post("/", status_code=201, responses={409: {"description": "Client already exists"}})
+@router.post("/", status_code=201, response_model=ClientRead)
 def create_client(client: ClientCreate): 
     pass
 
-@router.put("/{client_id}")
+@router.put("/{client_id}", response_model=ClientUpdate)
 def update_client(client_id: int, client: ClientUpdate):
     pass
 
-@router.delete("/{client_id}")
+@router.delete("/{client_id}", response_model=ClientDelete)
 def delete_client(client_id: int):
     pass
