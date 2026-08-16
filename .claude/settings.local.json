@@ -5,7 +5,9 @@
       "Bash(.venv/bin/python3 -m pip list)",
       "Bash(uv sync *)",
       "Bash(.venv/bin/python3 -c \"import fastapi, uvicorn, sqlmodel, phonenumbers, pydantic_extra_types; print\\('imports OK'\\)\")",
-      "Bash(rm *)"
+      "Bash(rm *)",
+      "Bash(xargs -I{} sh -c 'echo \"--{}--\"; cat {}')",
+      "Bash(/home/arsa/Inventory_System/.venv/bin/python3 -m pip list)"
     ]
   }
 }
