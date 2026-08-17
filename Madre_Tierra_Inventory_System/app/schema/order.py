@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 class OrderBase(SQLModel):
-    user_id: int
+    client_id: int
     total: float
 
 class OrderCreate(OrderBase):
@@ -13,7 +13,7 @@ class OrderRead(OrderBase):
     created_at: str
 
 class OrderUpdate(SQLModel):
-    user_id: Optional[int] = None
+    client_id: Optional[int] = None
     total: Optional[float] = None
 
 class OrderDelete(SQLModel):

@@ -1,6 +1,6 @@
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_validator, EmailStr
-from models import order
+from app.models import order
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 class Client(SQLModel, table=True):

@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlmodel import Session, select
-from schema.order import OrderUpdate
-from models.order import Order
+from app.schema.order import OrderUpdate
+from app.models.order import Order
 
 def create_order(session: Session, order_data: Order) -> Order:
     session.add(order_data)

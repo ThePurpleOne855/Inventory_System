@@ -1,8 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import  APIRouter, HTTPException
 from app.schema.client import ClientCreate, ClientDelete, ClientRead, ClientUpdate 
-
-
-app = FastAPI()
 
 router = APIRouter(
     prefix="/clients",

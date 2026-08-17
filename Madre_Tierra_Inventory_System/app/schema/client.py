@@ -28,6 +28,10 @@ class ClientUpdate(ClientBase):
     email: Optional[str] = None
     phone_number: Optional[PhoneNumber] = None
 
+class ClientSeachParams(ClientBase):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
 
 class ClientLogin(SQLModel):
     email: str

@@ -1,7 +1,7 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter
 
-from Madre_Tierra_Inventory_System.app.schema.client import ClientUpdate
-from Madre_Tierra_Inventory_System.app.schema.order import OrderDelete, OrderRead
+from app.schema.client import ClientUpdate
+from app.schema.order import OrderDelete, OrderRead
 
 
 router = APIRouter(

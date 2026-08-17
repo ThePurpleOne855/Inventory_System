@@ -1,13 +1,13 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter
 
-from Madre_Tierra_Inventory_System.app.schema.product import ProductRead
+from app.schema.product import ProductRead
 
 router = APIRouter(
     prefix="/products",
     tags=["products"]
 )
 
-router.get("/", response_model=list[ProductRead])
+@router.get("/", response_model=list[ProductRead])
 def list_products():
     pass
 

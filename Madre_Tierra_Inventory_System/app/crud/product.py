@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlmodel import Session, select
-from schema.product import ProductUpdate
-from models.product import  Product
+from app.schema.product import ProductUpdate
+from app.models.product import  Product
 
 
 def create_product(session: Session, product_data: Product) -> Product:

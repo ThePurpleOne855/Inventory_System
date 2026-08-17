@@ -1,7 +1,8 @@
 from typing import Optional
 from sqlmodel import Session, select
-from models.client import Client
-from schema.client import ClientUpdate
+from app.models.client import Client
+from app.schema.client import ClientUpdate
+from pydantic import EmailStr
 
 
 def create_client(session: Session, client_data: Client) -> Client:
@@ -10,8 +11,13 @@ def create_client(session: Session, client_data: Client) -> Client:
     session.refresh(client_data)
     return client_data
 
+def get_client_by_email(session: Session, client_email: EmailStr) -> Client | None:
+    return session.exec(
+        select(Client).where(Client.email == client_email)
+    ).first()
 
-def get_client(session: Session, client_id: int) -> Optional[Client]:
+
+def get_client_by_id(session: Session, client_id: int) -> Optional[Client]:
     return session.get(Client, client_id)
 
 
