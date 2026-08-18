@@ -28,7 +28,7 @@ class ClientUpdate(ClientBase):
     email: Optional[str] = None
     phone_number: Optional[PhoneNumber] = None
 
-class ClientSeachParams(ClientBase):
+class ClientSearchParams(ClientBase):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
 
