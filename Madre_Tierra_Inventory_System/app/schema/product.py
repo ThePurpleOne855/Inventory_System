@@ -1,23 +1,29 @@
-from sqlmodel import Field, SQLModel
-from typing import Optional
+from decimal import Decimal
+
+from sqlmodel import SQLModel
+
 
 class ProductBase(SQLModel):
     name: str
-    description: Optional[str] = None
-    price: float
+    description: str | None = None
+    price: Decimal
     quantity: int
 
+
 class ProductCreate(ProductBase):
-    pass
+    quantity: int = 0
+
 
 class ProductRead(ProductBase):
     id: int
 
+
 class ProductUpdate(SQLModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    price: Optional[float] = None
-    quantity: Optional[int] = None
+    name: str | None = None
+    description: str | None = None
+    price: Decimal | None = None
+    quantity: int | None = None
+
 
 class ProductDelete(SQLModel):
     id: int

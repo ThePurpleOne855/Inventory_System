@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 from app.models.client import Client
 from app.schema.client import ClientUpdate, ClientSearchParams
 from pydantic import EmailStr
+from sqlalchemy.exc import IntegrityError
 
 
 def create_client(session: Session, client_data: Client) -> Client:
@@ -11,7 +12,7 @@ def create_client(session: Session, client_data: Client) -> Client:
     session.refresh(client_data)
     return client_data
 
-def get_client_by_email(session: Session, client_email: EmailStr) -> Client | None:
+def get_client_by_email(session: Session, client_email: EmailStr) -> Optional[Client]:
     return session.exec(
         select(Client).where(Client.email == client_email)
     ).first()
@@ -35,7 +36,12 @@ def update_client(session: Session, client_id: int, client_in: ClientUpdate) -> 
     update_data = client_in.model_dump(exclude_unset=True) # Only fields sent
     client_obj.sqlmodel_update(update_data)
     session.add(client_obj)
-    session.commit()
+    
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise ValueError("Email already registered to another client")
     session.refresh(client_obj)
     return client_obj
 
@@ -62,7 +68,7 @@ def search_client(session: Session, params: ClientSearchParams, limit: int = 50,
             query = query.where(Client.email.ilike(f"%{params.email}%"))
 
     if params.phone_number is not None:
-            query = query.where(Client.phone_number.ilike(f"%{params.email}%"))
+            query = query.where(Client.phone_number.ilike(f"%{params.phone_number}%"))
 
     query = query.offset(offset).limit(limit)
 

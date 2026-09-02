@@ -1,13 +1,22 @@
-# from sqlmodel import create_engine, SQLModel
-# import os
-# from dotenv import load_dotenv
+import os
+from collections.abc import Generator
 
-# load_dotenv()
-# password = os.environ.get("DB_PASSWORD")
+from dotenv import load_dotenv
+from sqlmodel import Session, SQLModel, create_engine
 
-# DATABASE_URL = f"postgresql+psycopg2://<root>:{password}@localhost:5432/postgres"
+from app.models import Client, Order, Product
 
-# engine = create_engine(DATABASE_URL, echo=True)
+load_dotenv()
 
-# def create_db_and_tables():
-#     SQLModel.metadata.create_all(engine)
+DATABASE_URL = os.environ["DATABASE_URL"]
+
+engine = create_engine(DATABASE_URL, echo=True)
+
+
+def create_db_and_tables() -> None:
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session

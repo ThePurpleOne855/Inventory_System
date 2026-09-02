@@ -16,7 +16,7 @@ def get_client(client_id: int):
 
 @router.post("/", status_code=201, response_model=ClientRead)
 def create_client(client: ClientCreate): 
-    pass
+     pass
 
 @router.put("/{client_id}", response_model=ClientUpdate)
 def update_client(client_id: int, client: ClientUpdate):
@@ -25,3 +25,4 @@ def update_client(client_id: int, client: ClientUpdate):
 @router.delete("/{client_id}", response_model=ClientDelete)
 def delete_client(client_id: int):
     pass
+
