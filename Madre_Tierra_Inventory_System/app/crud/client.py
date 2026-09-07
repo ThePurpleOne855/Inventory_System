@@ -1,6 +1,6 @@
 from pydantic import EmailStr
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, select
+from sqlmodel import Session, select, col, Sequence
 
 from app.models.client import Client
 from app.schema.client import ClientSearchParams, ClientUpdate
@@ -58,22 +58,21 @@ def delete_client(session: Session, client_id: int) -> bool:
 
 def search_client(
     session: Session, params: ClientSearchParams, limit: int = 50, offset: int = 0
-):
+) -> list[Client]:
     query = select(Client)
 
     if params.name is not None:
-        query = query.where(Client.name.ilike(f"%{params.name}%"))
+        query = query.where(col(Client.name).ilike(f"%{params.name}%"))
 
     if params.last_name is not None:
-        query = query.where(Client.last_name.ilike(f"%{params.last_name}%"))
+        query = query.where(col(Client.last_name).ilike(f"%{params.last_name}%"))
 
     if params.email is not None:
-        query = query.where(Client.email.ilike(f"%{params.email}%"))
+        query = query.where(col(Client.email).ilike(f"%{params.email}%"))
 
     if params.phone_number is not None:
-        query = query.where(Client.phone_number.ilike(f"%{params.phone_number}%"))
+        query = query.where(col(Client.phone_number).ilike(f"%{params.phone_number}%"))
 
     query = query.offset(offset).limit(limit)
 
-    return session.exec(query).all()
-
+    return list(session.exec(query).all())
