@@ -9,3 +9,7 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Personal dev guide (not part of the project deliverable)
+steps/
+improvement.md
