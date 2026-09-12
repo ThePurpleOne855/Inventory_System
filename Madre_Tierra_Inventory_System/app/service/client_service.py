@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlmodel import Session, Sequence
+from sqlmodel import Session
 
 from app.core.security import hash_password
 from app.crud.client import (
@@ -10,7 +10,7 @@ from app.crud.client import (
     update_client,
 )
 from app.models.client import Client
-from app.schema.client import ClientCreate, ClientRead, ClientSearchParams, ClientUpdate
+from app.schema.client import ClientCreate, ClientSearchParams, ClientUpdate
 from app.service.client_exceptions import (
     ClientNotFoundByEmailError,
     ClientNotFoundByIdError,
@@ -47,18 +47,15 @@ def retrieve_client_by_email_service(session: Session, client_email: EmailStr):
     return client
 
 
-def search_client_service(
-    session: Session, params: ClientSearchParams
-) -> list[ClientRead]:
-    return search_client(session, params)
+def search_client_service(session: Session, params: ClientSearchParams) -> list[Client]:
+    return list(search_client(session, params))
 
 
 def update_client_service(
     session: Session, client_id, client_new_data_in: ClientUpdate
-) -> ClientRead:
+) -> Client:
     updated = update_client(session, client_id, client_new_data_in)
 
     if updated is None:
         raise ClientNotFoundForUpdate(client_id, client_new_data_in)
     return updated
-

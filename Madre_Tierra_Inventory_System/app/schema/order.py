@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from sqlmodel import SQLModel
 
+from app.schema.order_product import OrderProductCreate
+
 
 class OrderBase(SQLModel):
     client_id: int
@@ -10,7 +12,7 @@ class OrderBase(SQLModel):
 
 
 class OrderCreate(OrderBase):
-    pass
+    products: list[OrderProductCreate]
 
 
 class OrderRead(OrderBase):

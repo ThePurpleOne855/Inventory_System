@@ -1,7 +1,7 @@
-from typing import Optional
 from sqlmodel import Session, select
+
+from app.models.product import Product
 from app.schema.product import ProductUpdate
-from app.models.product import  Product
 
 
 def create_product(session: Session, product_data: Product) -> Product:
@@ -10,14 +10,19 @@ def create_product(session: Session, product_data: Product) -> Product:
     session.refresh(product_data)
     return product_data
 
-def get_product(session: Session, product_id) -> Optional[Product]:
+
+def get_product(session: Session, product_id) -> Product | None:
     return session.get(Product, product_id)
-    
+
+
 def get_products(session: Session, offset: int = 0, limit: int = 100) -> list[Product]:
     statement = select(Product).offset(offset).limit(limit)
     return list(session.exec(statement).all())
 
-def update_product(session: Session, product_id: int, product_in: ProductUpdate) -> Optional[Product]:
+
+def update_product(
+    session: Session, product_id: int, product_in: ProductUpdate
+) -> Product | None:
     product_obj = session.get(Product, product_id)
 
     if not product_obj:
@@ -29,7 +34,8 @@ def update_product(session: Session, product_id: int, product_in: ProductUpdate)
     session.commit()
     session.refresh(product_obj)
     return product_obj
-    
+
+
 def delete_product(session: Session, product_id: int) -> bool:
     product_obj = session.get(Product, product_id)
 
@@ -39,4 +45,3 @@ def delete_product(session: Session, product_id: int) -> bool:
     session.delete(product_obj)
     session.commit()
     return True
-    

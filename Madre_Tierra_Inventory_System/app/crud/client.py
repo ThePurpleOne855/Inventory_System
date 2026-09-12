@@ -1,6 +1,6 @@
 from pydantic import EmailStr
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, select, col, Sequence
+from sqlmodel import Session, col, select
 
 from app.models.client import Client
 from app.schema.client import ClientSearchParams, ClientUpdate

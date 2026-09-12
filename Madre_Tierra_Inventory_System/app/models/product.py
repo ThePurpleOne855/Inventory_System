@@ -14,4 +14,4 @@ class Product(SQLModel, table=True):
     price: Decimal
     quantity: int
 
-    order_items: list["OrderProduct"] = Relationship(back_populates="product")
+    order_products: list["OrderProduct"] = Relationship(back_populates="product")

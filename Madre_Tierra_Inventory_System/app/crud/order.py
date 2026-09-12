@@ -1,23 +1,28 @@
-from typing import Optional
 from sqlmodel import Session, select
-from app.schema.order import OrderUpdate
+
 from app.models.order import Order
+from app.schema.order import OrderUpdate
+
 
 def create_order(session: Session, order_data: Order) -> Order:
     session.add(order_data)
     session.commit()
     session.refresh(order_data)
     return order_data
-    
 
-def get_order(session: Session, order_id: int) -> Optional[Order]:
+
+def get_order(session: Session, order_id: int) -> Order | None:
     return session.get(Order, order_id)
+
 
 def get_orders(session: Session, offset: int = 0, limit: int = 100) -> list[Order]:
     statement = select(Order).offset(offset).limit(limit)
     return list(session.exec(statement).all())
 
-def update_order(session: Session, order_id: int, order_in: OrderUpdate) -> Optional[Order]:
+
+def update_order(
+    session: Session, order_id: int, order_in: OrderUpdate
+) -> Order | None:
     order_obj = session.get(Order, order_id)
 
     if not order_obj:
@@ -30,6 +35,7 @@ def update_order(session: Session, order_id: int, order_in: OrderUpdate) -> Opti
     session.refresh(order_obj)
     return order_obj
 
+
 def delete_order(session: Session, order_id: int) -> bool:
     order_obj = session.get(Order, order_id)
 
@@ -38,4 +44,5 @@ def delete_order(session: Session, order_id: int) -> bool:
 
     session.delete(order_obj)
     session.commit()
-    return True 
+    return True
+
