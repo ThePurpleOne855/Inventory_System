@@ -2,15 +2,20 @@
 
 A FastAPI + SQLModel inventory and order management backend for Madre Tierra, backed by PostgreSQL.
 
-Manages clients, products, and orders (with order line items), with a service layer that
-sits between the API routers and the database.
+Designed to manage clients, products, and orders (with order line items), using a service
+layer between API routers and database access.
 
 ## Status
 
-This project is under active development. The `client` service/CRUD layer and database schema
-are functional; the `orders`/`products` routers and service layer are still stubs. See
-[`steps/README.md`](steps/README.md) for the current build checklist and
-[`improvement.md`](improvement.md) for the detailed reasoning behind it.
+This project is under active development. The database models, schemas, migrations, and CRUD
+modules are present. The service layer covers client and product CRUD, order CRUD, and order line
+items. Order services calculate totals from current product prices and deduct or restore inventory
+when line items are added or removed.
+
+The client, order, and product routers are still route stubs, so the service operations are not
+available through HTTP yet. Authentication and analytics are out of scope for the current
+development stage and are not mounted in the API.
+
 
 ## Tech Stack
 
@@ -102,14 +107,17 @@ Routers are mounted with the following prefixes:
 - `/orders`
 - `/products`
 
-Each exposes list, get-by-id, create, update, and delete endpoints. See `/docs` for the full
-interactive schema once the app is running.
+The client, order, and product route prefixes are registered, but their handlers are currently
+stubs. The interactive docs at `/docs` show the declared routes and schemas, not completed
+workflows. Authentication and analytics routes are not mounted.
 
 ## Running Tests
 
 ```bash
-uv run pytest
+uv run pytest app/test/test_relationships.py
 ```
+
+The relationship test checks the Client ↔ Order model mapping. It passed when last run.
 
 ## Notes
 

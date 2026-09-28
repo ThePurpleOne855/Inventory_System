@@ -24,3 +24,8 @@ class ClientNotFoundForUpdate(Exception):
             f"Client Not Found! Please verify the client's information before updating. \n Client ID: {client_id}."
         )
 
+
+class ClientHasOrdersError(Exception):
+    def __init__(self, client_id: int):
+        self.client_id = client_id
+        super().__init__(f"Client {client_id} cannot be deleted while orders exist")

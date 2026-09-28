@@ -1,4 +1,6 @@
 from .client_service import (
+    delete_client_service,
+    list_clients_service,
     register_client_service,
     retrieve_client_by_email_service,
     retrieve_client_by_id_service,
@@ -8,18 +10,42 @@ from .client_service import (
 from .order_service import (
     add_item_to_order_service,
     create_order_product_service,
+    create_order_service,
     delete_order_product_service,
+    delete_order_service,
     get_order_products_for_order_service,
+    list_orders_service,
+    retrieve_order_by_id_service,
+    update_order_service,
+)
+from .product_service import (
+    delete_product_service,
+    list_products_service,
+    register_product_service,
+    retrieve_product_by_id_service,
+    update_product_service,
 )
 
 __all__ = [
     "add_item_to_order_service",
     "create_order_product_service",
+    "create_order_service",
+    "delete_client_service",
     "delete_order_product_service",
+    "delete_order_service",
+    "delete_product_service",
     "get_order_products_for_order_service",
+    "list_clients_service",
+    "list_orders_service",
+    "list_products_service",
     "register_client_service",
+    "register_product_service",
     "retrieve_client_by_email_service",
     "retrieve_client_by_id_service",
+    "retrieve_order_by_id_service",
+    "retrieve_product_by_id_service",
     "search_client_service",
     "update_client_service",
+    "update_order_service",
+    "update_product_service",
 ]

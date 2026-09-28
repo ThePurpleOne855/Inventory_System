@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from sqlmodel import SQLModel
 
 
@@ -8,7 +9,7 @@ class OrderProductBase(SQLModel):
 
 
 class OrderProductCreate(OrderProductBase):
-    price: Decimal
+    pass
 
 
 class OrderProductRead(OrderProductBase):

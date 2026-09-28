@@ -3,6 +3,12 @@ from sqlmodel import Session, select
 from app.models.order_product import OrderProduct
 
 
+def get_order_product_by_id(
+    session: Session, order_product_id: int
+) -> OrderProduct | None:
+    return session.get(OrderProduct, order_product_id)
+
+
 def create_order_product(
     session: Session, order_product_data: OrderProduct
 ) -> OrderProduct:

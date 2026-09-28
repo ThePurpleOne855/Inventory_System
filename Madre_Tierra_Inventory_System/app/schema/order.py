@@ -6,13 +6,14 @@ from sqlmodel import SQLModel
 from app.schema.order_product import OrderProductCreate
 
 
+class OrderCreate(SQLModel):
+    client_id: int
+    products: list[OrderProductCreate]
+
+
 class OrderBase(SQLModel):
     client_id: int
     total: Decimal
-
-
-class OrderCreate(OrderBase):
-    products: list[OrderProductCreate]
 
 
 class OrderRead(OrderBase):
@@ -22,7 +23,6 @@ class OrderRead(OrderBase):
 
 class OrderUpdate(SQLModel):
     client_id: int | None = None
-    total: Decimal | None = None
 
 
 class OrderDelete(SQLModel):
