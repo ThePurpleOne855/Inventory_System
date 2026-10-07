@@ -6,11 +6,32 @@ from sqlmodel import Field, SQLModel
 class ClientBase(SQLModel):
     name: str
     last_name: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    zipcode: str | None = None
     email: EmailStr = Field(index=True)
     phone_number: PhoneNumber = Field(index=True)
 
 
-class ClientCreate(ClientBase):
+class ClientNewProfile(ClientBase):
+    address: str = Field(min_length=1)
+    city: str = Field(min_length=1)
+    state: str = Field(min_length=1)
+    country: str = Field(min_length=1)
+    zipcode: str = Field(min_length=1)
+
+    @field_validator("name", "address", "city", "state", "country", "zipcode")
+    @classmethod
+    def require_nonblank(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("This field is required")
+        return value
+
+
+class ClientCreate(ClientNewProfile):
     @field_validator("password")
     @classmethod
     def validate_password(cls, v: str) -> str:

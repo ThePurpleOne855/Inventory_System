@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bark-50: #f6f5f1;
+  --color-bark-100: #e8e5dc;
+  --color-bark-200: #d3cdbd;
+  --color-bark-700: #4a4336;
+  --color-bark-800: #332e25;
+  --color-bark-900: #1f1b15;
+  --color-leaf-50: #eefbf3;
+  --color-leaf-100: #d6f5e3;
+  --color-leaf-500: #1f9d55;
+  --color-leaf-600: #19854a;
+  --color-leaf-700: #146b3d;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-bark-50 text-bark-900 antialiased;
+}
+
+/* Inputs repeat on every form in the app; one class keeps them identical. */
+@utility field {
+  @apply w-full rounded-lg border border-bark-200 bg-white px-3 py-2 text-sm
+         text-bark-900 placeholder:text-bark-700/40
+         focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/20 focus:outline-none
+         disabled:cursor-not-allowed disabled:bg-bark-100/60;
+}
+
+@utility label {
+  @apply mb-1.5 block text-xs font-semibold tracking-wide text-bark-700 uppercase;
+}

@@ -1,7 +1,11 @@
 from decimal import Decimal
+import secrets
 
-from sqlmodel import Session
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import Session, select, func
 
+from app.core.security import hash_password
+from app.models.client import Client
 from app.crud.client import get_client_by_id
 from app.crud.order import get_order, get_orders, update_order
 from app.crud.order_product import (
@@ -14,7 +18,7 @@ from app.models.order import Order
 from app.models.order_product import OrderProduct
 from app.schema.order import OrderCreate, OrderUpdate
 from app.schema.order_product import OrderProductCreate
-from app.service.client_exceptions import ClientNotFoundByIdError
+from app.service.client_exceptions import ClientNotFoundByIdError, DuplicateClientEmailError
 from app.service.order_exceptions import (
     InsufficientProductStockError,
     InvalidOrderQuantityError,
@@ -25,7 +29,8 @@ from app.service.order_exceptions import (
 
 
 def create_order_service(session: Session, order_in: OrderCreate) -> Order:
-    if get_client_by_id(session, order_in.client_id) is None:
+    client = get_client_by_id(session, order_in.client_id) if order_in.client_id is not None else None
+    if order_in.client_id is not None and client is None:
         raise ClientNotFoundByIdError(order_in.client_id)
     if not order_in.products:
         raise ValueError("An order must contain at least one product")
@@ -49,8 +54,27 @@ def create_order_service(session: Session, order_in: OrderCreate) -> Order:
         products[product_id] = product
         total += product.price * quantity
 
-    order = Order(client_id=order_in.client_id, total=float(total))
     try:
+        if order_in.client is not None:
+            details = order_in.client.model_dump()
+            details["name"] = details["name"].strip()
+            duplicate = session.exec(select(Client).where(
+                func.lower(Client.email) == str(details["email"]).lower()
+            )).first()
+            if duplicate is not None and (client is None or duplicate.id != client.id):
+                raise DuplicateClientEmailError(
+                    "A client with this email already exists. Select their profile to use it."
+                )
+            if client is None:
+                # Customer profiles do not authenticate; retain the legacy hash column.
+                client = Client(**details, hashed_password=hash_password(secrets.token_urlsafe(32)))
+            else:
+                client.sqlmodel_update(details)
+            session.add(client)
+            session.flush()
+        if client is None or client.id is None:
+            raise ValueError("Select a client or enter new client details")
+        order = Order(client_id=client.id, total=float(total))
         session.add(order)
         session.flush()
         if order.id is None:
@@ -71,6 +95,14 @@ def create_order_service(session: Session, order_in: OrderCreate) -> Order:
 
         session.commit()
         session.refresh(order)
+    except IntegrityError as exc:
+        session.rollback()
+        if order_in.client is not None and session.exec(select(Client).where(
+            func.lower(Client.email) == str(order_in.client.email).lower(),
+            Client.id != order_in.client_id if order_in.client_id is not None else True,
+        )).first() is not None:
+            raise DuplicateClientEmailError("A client with this email already exists. Select their profile.") from exc
+        raise
     except Exception:
         session.rollback()
         raise

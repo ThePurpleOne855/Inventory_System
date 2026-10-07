@@ -12,8 +12,10 @@ dependencies = [
     "psycopg2-binary>=2.9.12",
     "pydantic-extra-types>=2.11.1",
     "pydantic[email]>=2.13.4",
+    "pyjwt>=2.15.1",
     "pytest>=9.1.1",
     "python-dotenv>=1.2.3",
+    "reportlab>=5.0.1",
     "sqlmodel>=0.0.39",
     "uvicorn>=0.52.1",
 ]
@@ -25,3 +27,8 @@ package = false
 reportIncompatibleVariableOverride = false
 venvPath = "."
 venv = ".venv"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+]

@@ -4,6 +4,7 @@ from sqlmodel import Session, col, select
 
 from app.models.client import Client
 from app.schema.client import ClientSearchParams, ClientUpdate
+from app.service.client_exceptions import DuplicateClientEmailError
 
 
 def create_client(session: Session, client_data: Client) -> Client:
@@ -41,7 +42,7 @@ def update_client(
         session.commit()
     except IntegrityError:
         session.rollback()
-        raise ValueError("Email already registered to another client")
+        raise DuplicateClientEmailError("Email already registered to another client")
     session.refresh(client_obj)
     return client_obj
 

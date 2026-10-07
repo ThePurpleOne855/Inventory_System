@@ -1,3 +1,7 @@
+class DuplicateClientEmailError(ValueError):
+    """A client already uses the requested email address."""
+
+
 class ClientNotFoundByIdError(Exception):
     def __init__(self, client_id: int):
         self.client_id = client_id

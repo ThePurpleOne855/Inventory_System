@@ -12,6 +12,11 @@ class Client(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str
     last_name: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    zipcode: str | None = None
     email: EmailStr = Field(index=True, unique=True)
     phone_number: PhoneNumber = Field(index=True)
     hashed_password: str

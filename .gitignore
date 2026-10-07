@@ -9,7 +9,13 @@ wheels/
 
 # Virtual environments
 .venv
+.env.auth
 
 # Personal dev guide (not part of the project deliverable)
 steps/
 improvement.md
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+.env.auth

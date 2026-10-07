@@ -19,17 +19,23 @@ from app.service.client_exceptions import (
     ClientNotFoundByEmailError,
     ClientNotFoundByIdError,
     ClientNotFoundForUpdate,
+    DuplicateClientEmailError,
 )
 
 
 def register_client_service(session: Session, client_in: ClientCreate) -> Client:
     if get_client_by_email(session, client_in.email) is not None:
-        raise ValueError("Email already registered")
+        raise DuplicateClientEmailError("Email already registered")
 
     client = Client(
         email=client_in.email,
         name=client_in.name,
         last_name=client_in.last_name,
+        address=client_in.address,
+        city=client_in.city,
+        state=client_in.state,
+        country=client_in.country,
+        zipcode=client_in.zipcode,
         phone_number=client_in.phone_number,
         hashed_password=hash_password(client_in.password),
     )
@@ -38,7 +44,7 @@ def register_client_service(session: Session, client_in: ClientCreate) -> Client
         return create_client(session, client)
     except IntegrityError as exc:
         session.rollback()
-        raise ValueError("Email already registered") from exc
+        raise DuplicateClientEmailError("Email already registered") from exc
 
 
 def retrieve_client_by_id_service(session: Session, client_id: int) -> Client:
