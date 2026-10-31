@@ -6,6 +6,9 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' })
 const countries = getCountries().map((code) => ({ code, name: countryNames.of(code) ?? code }))
   .sort((a, b) => a.name.localeCompare(b.name))
 
+/** Acquisition channels shown on the dashboard. Edit this list to match how you sell. */
+const SOURCES = ['Instagram', 'Facebook', 'WhatsApp', 'Website', 'Referral', 'In person', 'Other']
+
 export function ClientContactFields({ value, onChange, required, prefix }: {
   value: ClientInput
   onChange: (change: Partial<ClientInput>) => void
@@ -54,6 +57,19 @@ export function ClientContactFields({ value, onChange, required, prefix }: {
         >
           <option value="">Select country</option>
           {countries.map(({ code, name }) => <option key={code} value={code}>{name}</option>)}
+        </select>
+      </div>
+      <div>
+        <label className="label" htmlFor={`${prefix}-source`}>How they found you</label>
+        <select
+          id={`${prefix}-source`} className="field" value={value.source ?? ''}
+          onChange={(event) => onChange({ source: event.target.value })}
+        >
+          <option value="">Not recorded</option>
+          {SOURCES.map((source) => <option key={source} value={source}>{source}</option>)}
+          {value.source && !SOURCES.includes(value.source) && (
+            <option value={value.source}>{value.source}</option>
+          )}
         </select>
       </div>
     </>

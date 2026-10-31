@@ -14,6 +14,7 @@ from app.service.client_exceptions import (
 )
 from app.service.order_exceptions import (
     InsufficientProductStockError,
+    OrderCancelledError,
     OrderNotFoundError,
     OrderProductNotFoundError,
 )
@@ -53,6 +54,7 @@ def service_errors():
         ClientHasOrdersError,
         ProductInUseError,
         InsufficientProductStockError,
+        OrderCancelledError,
     ) as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except (EmailNotConfiguredError, MailServerError) as exc:

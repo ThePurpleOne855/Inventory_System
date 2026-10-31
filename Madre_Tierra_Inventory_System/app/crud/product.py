@@ -11,8 +11,9 @@ def create_product(session: Session, product_data: Product) -> Product:
     return product_data
 
 
-def get_product(session: Session, product_id) -> Product | None:
-    return session.get(Product, product_id)
+def get_product(session: Session, product_id, for_update: bool = False) -> Product | None:
+    # for_update locks the row until commit so concurrent orders can't oversell.
+    return session.get(Product, product_id, with_for_update=for_update)
 
 
 def get_products(session: Session, offset: int = 0, limit: int = 100) -> list[Product]:

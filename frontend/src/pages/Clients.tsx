@@ -221,6 +221,7 @@ function ClientForm({
           state: client.state ?? '',
           country: client.country ?? '',
           zipcode: client.zipcode ?? '',
+          source: client.source ?? '',
           email: client.email,
           phone_number: displayPhone(client.phone_number),
         }

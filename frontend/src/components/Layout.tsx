@@ -4,6 +4,7 @@ import { useAuth } from '../lib/auth'
 import { Button } from './ui'
 
 const NAV = [
+  { to: '/dashboard', label: 'Dashboard', hint: 'Sales and customers' },
   { to: '/clients', label: 'Clients', hint: 'Everyone you sell to' },
   { to: '/inventory', label: 'Inventory', hint: 'Products and stock' },
   { to: '/orders', label: 'Orders', hint: 'Orders and invoices' },

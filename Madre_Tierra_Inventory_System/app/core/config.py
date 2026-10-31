@@ -44,6 +44,9 @@ class Settings:
     company_phone: str = _get("COMPANY_PHONE", "")
     currency: str = _get("CURRENCY", "$")
 
+    # --- Dashboard: days and months are counted in this time zone ---
+    business_timezone: str = _get("BUSINESS_TIMEZONE", "America/New_York")
+
     # --- Outgoing email (SMTP) ---
     smtp_host: str = _get("SMTP_HOST", "")
     smtp_port: int = _get_int("SMTP_PORT", 587)

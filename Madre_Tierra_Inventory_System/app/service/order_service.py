@@ -14,13 +14,15 @@ from app.crud.order_product import (
     get_order_products_for_order,
 )
 from app.crud.product import get_product
-from app.models.order import Order
+from app.models.order import Order, utc_now
 from app.models.order_product import OrderProduct
+from app.models.product import Product
 from app.schema.order import OrderCreate, OrderUpdate
 from app.schema.order_product import OrderProductCreate
 from app.service.client_exceptions import ClientNotFoundByIdError, DuplicateClientEmailError
 from app.service.order_exceptions import (
     InsufficientProductStockError,
+    OrderCancelledError,
     InvalidOrderQuantityError,
     OrderNotFoundError,
     OrderProductNotFoundError,
@@ -43,8 +45,8 @@ def create_order_service(session: Session, order_in: OrderCreate) -> Order:
 
     products = {}
     total = Decimal("0")
-    for product_id, quantity in quantities.items():
-        product = get_product(session, product_id)
+    for product_id, quantity in sorted(quantities.items()):
+        product = get_product(session, product_id, for_update=True)
         if product is None:
             raise ProductNotFoundError(product_id)
         if product.quantity < quantity:
@@ -74,7 +76,7 @@ def create_order_service(session: Session, order_in: OrderCreate) -> Order:
             session.flush()
         if client is None or client.id is None:
             raise ValueError("Select a client or enter new client details")
-        order = Order(client_id=client.id, total=float(total))
+        order = Order(client_id=client.id, total=total)
         session.add(order)
         session.flush()
         if order.id is None:
@@ -141,22 +143,17 @@ def update_order_service(
 
 
 def delete_order_service(session: Session, order_id: int) -> bool:
-    order = get_order(session, order_id)
+    order = get_order(session, order_id, for_update=True)
     if order is None:
         raise OrderNotFoundError(order_id)
 
-    items = get_order_products_for_order(session, order_id)
-    products = []
-    for item in items:
-        product = get_product(session, item.product_id)
-        if product is None:
-            raise ProductNotFoundError(item.product_id)
-        products.append((item, product))
+    items, products = _lock_order_stock(session, order_id)
 
     try:
-        for item, product in products:
-            product.quantity += item.quantity
-            session.add(product)
+        for item, product in zip(items, products):
+            if order.cancelled_at is None:
+                product.quantity += item.quantity
+                session.add(product)
             session.delete(item)
         session.delete(order)
         session.commit()
@@ -164,6 +161,42 @@ def delete_order_service(session: Session, order_id: int) -> bool:
         session.rollback()
         raise
     return True
+
+
+def cancel_order_service(session: Session, order_id: int) -> Order:
+    """Return the stock but keep the order, so sales history stays complete."""
+    order = get_order(session, order_id, for_update=True)
+    if order is None:
+        raise OrderNotFoundError(order_id)
+    if order.cancelled_at is not None:
+        raise OrderCancelledError(order_id)
+
+    items, products = _lock_order_stock(session, order_id)
+    try:
+        for item, product in zip(items, products):
+            product.quantity += item.quantity
+            session.add(product)
+        order.cancelled_at = utc_now()
+        session.add(order)
+        session.commit()
+        session.refresh(order)
+    except Exception:
+        session.rollback()
+        raise
+    return order
+
+
+def _lock_order_stock(
+    session: Session, order_id: int
+) -> tuple[list[OrderProduct], list[Product]]:
+    items = sorted(get_order_products_for_order(session, order_id), key=lambda item: item.product_id)
+    products = []
+    for item in items:
+        product = get_product(session, item.product_id, for_update=True)
+        if product is None:
+            raise ProductNotFoundError(item.product_id)
+        products.append(product)
+    return items, products
 
 
 def create_order_product_service(
@@ -190,13 +223,15 @@ def get_order_products_for_order_service(
 def add_item_to_order_service(
     session: Session, order_id: int, item_in: OrderProductCreate
 ) -> OrderProduct:
-    order = get_order(session, order_id)
+    order = get_order(session, order_id, for_update=True)
     if order is None:
         raise OrderNotFoundError(order_id)
+    if order.cancelled_at is not None:
+        raise OrderCancelledError(order_id)
     if item_in.quantity <= 0:
         raise InvalidOrderQuantityError(item_in.product_id, item_in.quantity)
 
-    product = get_product(session, item_in.product_id)
+    product = get_product(session, item_in.product_id, for_update=True)
     if product is None:
         raise ProductNotFoundError(item_in.product_id)
     if product.quantity < item_in.quantity:
@@ -221,7 +256,7 @@ def add_item_to_order_service(
         price_delta = order_product.unit_price * item_in.quantity
 
     product.quantity -= item_in.quantity
-    order.total = float(Decimal(str(order.total)) + price_delta)
+    order.total += price_delta
     try:
         session.add(product)
         session.add(order)
@@ -239,17 +274,17 @@ def delete_order_product_service(session: Session, order_product_id: int) -> boo
     if item is None:
         raise OrderProductNotFoundError(order_product_id)
 
-    order = get_order(session, item.order_id)
+    order = get_order(session, item.order_id, for_update=True)
     if order is None:
         raise OrderNotFoundError(item.order_id)
-    product = get_product(session, item.product_id)
+    if order.cancelled_at is not None:
+        raise OrderCancelledError(item.order_id)
+    product = get_product(session, item.product_id, for_update=True)
     if product is None:
         raise ProductNotFoundError(item.product_id)
 
     product.quantity += item.quantity
-    order.total = float(
-        Decimal(str(order.total)) - item.unit_price * item.quantity
-    )
+    order.total -= item.unit_price * item.quantity
     try:
         session.add(product)
         session.add(order)

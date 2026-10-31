@@ -28,7 +28,7 @@ async function loadAll<T>(list: (limit: number, offset: number) => Promise<T[]>)
 }
 
 const EMPTY_CLIENT: ClientInput = {
-  name: '', last_name: '', address: '', city: '', state: '', country: '', zipcode: '', phone_number: '', email: '',
+  name: '', last_name: '', address: '', city: '', state: '', country: '', zipcode: '', phone_number: '', email: '', source: '',
 }
 
 export default function Orders() {
@@ -108,15 +108,15 @@ export default function Orders() {
     }
   }
 
-  async function remove(order: Order) {
+  async function cancel(order: Order) {
     setConfirming(null)
     setError('')
     try {
-      await api.orders.remove(order.id)
-      setOrders((previous) => previous.filter((item) => item.id !== order.id))
-      setNotice(`Order #${order.id} was deleted and its stock returned.`)
+      const cancelled = await api.orders.cancel(order.id)
+      setOrders((previous) => previous.map((item) => (item.id === order.id ? cancelled : item)))
+      setNotice(`Order #${order.id} was cancelled and its stock returned.`)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not delete the order')
+      setError(caught instanceof Error ? caught.message : 'Could not cancel the order')
     }
   }
 
@@ -160,6 +160,7 @@ export default function Orders() {
                 {sorted.map((order) => {
                   const client = clientsById.get(order.client_id)
                   const busy = busyId === order.id
+                  const cancelled = order.cancelled_at !== null
                   return (
                     <tr key={order.id} className="border-b border-bark-100 last:border-0">
                       <td className="px-4 py-3 font-medium text-bark-900">#{order.id}</td>
@@ -168,7 +169,16 @@ export default function Orders() {
                       </td>
                       <td className="px-4 py-3 text-bark-700">{shortDate(order.created_at)}</td>
                       <td className="px-4 py-3 text-right font-medium text-bark-900">
-                        {money(order.total)}
+                        {cancelled ? (
+                          <>
+                            <span className="mr-2 rounded bg-bark-100 px-1.5 py-0.5 text-xs font-medium text-bark-700">
+                              Cancelled
+                            </span>
+                            <span className="text-bark-700 line-through">{money(order.total)}</span>
+                          </>
+                        ) : (
+                          money(order.total)
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap justify-end gap-1">
@@ -178,16 +188,20 @@ export default function Orders() {
                           <Button variant="ghost" disabled={busy} onClick={() => void download(order)}>
                             {busy ? '…' : 'PDF'}
                           </Button>
-                          <Button
-                            variant="ghost"
-                            disabled={busy}
-                            onClick={() => void emailInvoice(order)}
-                          >
-                            Email
-                          </Button>
-                          <Button variant="ghost" onClick={() => setConfirming(order)}>
-                            Delete
-                          </Button>
+                          {!cancelled && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                disabled={busy}
+                                onClick={() => void emailInvoice(order)}
+                              >
+                                Email
+                              </Button>
+                              <Button variant="ghost" onClick={() => setConfirming(order)}>
+                                Cancel
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -231,17 +245,17 @@ export default function Orders() {
       )}
 
       {confirming && (
-        <Modal title="Delete order" onClose={() => setConfirming(null)}>
+        <Modal title="Cancel order" onClose={() => setConfirming(null)}>
           <p className="text-sm text-bark-800">
-            Delete order <strong>#{confirming.id}</strong>? Its items are removed and the
-            stock is returned to inventory.
+            Cancel order <strong>#{confirming.id}</strong>? Its stock is returned to inventory.
+            The order stays in your history but no longer counts as a sale.
           </p>
           <div className="mt-6 flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setConfirming(null)}>
-              Cancel
+              Keep order
             </Button>
-            <Button variant="danger" onClick={() => void remove(confirming)}>
-              Delete
+            <Button variant="danger" onClick={() => void cancel(confirming)}>
+              Cancel order
             </Button>
           </div>
         </Modal>
@@ -290,6 +304,7 @@ function OrderForm({
       state: selected.state ?? '',
       country: selected.country ?? '',
       zipcode: selected.zipcode ?? '',
+      source: selected.source ?? '',
       phone_number: displayPhone(selected.phone_number),
       email: selected.email,
     } : { ...EMPTY_CLIENT })
@@ -616,6 +631,7 @@ function InvoicePreview({
                     client_id: invoice.client.id,
                     total: invoice.total,
                     created_at: invoice.created_at,
+                    cancelled_at: null,
                   })
                 }
               >

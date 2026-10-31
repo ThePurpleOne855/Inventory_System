@@ -37,6 +37,7 @@ def register_client_service(session: Session, client_in: ClientCreate) -> Client
         country=client_in.country,
         zipcode=client_in.zipcode,
         phone_number=client_in.phone_number,
+        source=client_in.source,
         hashed_password=hash_password(client_in.password),
     )
 

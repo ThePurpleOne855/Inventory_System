@@ -28,6 +28,12 @@ class InsufficientProductStockError(ValueError):
         )
 
 
+class OrderCancelledError(Exception):
+    def __init__(self, order_id: int):
+        self.order_id = order_id
+        super().__init__(f"Order {order_id} is cancelled and can't be changed")
+
+
 class OrderProductNotFoundError(Exception):
     def __init__(self, order_product_id: int):
         self.order_product_id = order_product_id

@@ -19,6 +19,7 @@ class Client(SQLModel, table=True):
     zipcode: str | None = None
     email: EmailStr = Field(index=True, unique=True)
     phone_number: PhoneNumber = Field(index=True)
+    source: str | None = Field(default=None, max_length=50)
     hashed_password: str
 
     orders: list["Order"] = Relationship(back_populates="client")

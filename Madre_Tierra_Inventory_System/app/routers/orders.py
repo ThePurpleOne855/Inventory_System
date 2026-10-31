@@ -50,6 +50,12 @@ def delete_order(order_id: PositiveId, session: SessionDep):
     return OrderDelete(id=order_id)
 
 
+@router.post("/{order_id}/cancel", response_model=OrderRead)
+def cancel_order(order_id: PositiveId, session: SessionDep):
+    with service_errors():
+        return order_service.cancel_order_service(session, order_id)
+
+
 @router.get("/{order_id}/items", response_model=list[OrderProductRead])
 def list_order_items(order_id: PositiveId, session: SessionDep):
     with service_errors():

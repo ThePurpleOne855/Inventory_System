@@ -13,6 +13,15 @@ class ClientBase(SQLModel):
     zipcode: str | None = None
     email: EmailStr = Field(index=True)
     phone_number: PhoneNumber = Field(index=True)
+    source: str | None = None
+
+    @field_validator("source")
+    @classmethod
+    def normalize_source(cls, value: str | None) -> str | None:
+        value = (value or "").strip()
+        if len(value) > 50:
+            raise ValueError("Source must be 50 characters or fewer")
+        return value or None
 
 
 class ClientNewProfile(ClientBase):

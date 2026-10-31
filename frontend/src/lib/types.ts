@@ -12,6 +12,7 @@ export interface Client {
   zipcode: string | null
   email: string
   phone_number: string
+  source: string | null
 }
 
 export interface ClientInput {
@@ -24,6 +25,7 @@ export interface ClientInput {
   zipcode?: string | null
   email: string
   phone_number: string
+  source?: string | null
   password?: string
 }
 
@@ -47,6 +49,7 @@ export interface Order {
   client_id: number
   total: Money
   created_at: string
+  cancelled_at: string | null
 }
 
 export interface OrderItem {
@@ -95,4 +98,40 @@ export interface MailStatus {
   configured: boolean
   host: string
   sender: string
+}
+
+/** Mirrors app/schema/analytics.py. Months are YYYY-MM in the business time zone. */
+export interface PeriodTotals {
+  revenue: Money
+  orders: number
+  average_order: Money
+  new_customers: number
+  repeat_customers: number
+  cancelled_orders: number
+}
+
+export interface MonthTotals {
+  month: string
+  revenue: Money
+  orders: number
+  new_customers: number
+}
+
+export interface AnalyticsSummary {
+  start: string
+  end: string
+  timezone: string
+  currency: string
+  current: PeriodTotals
+  previous: PeriodTotals
+  monthly: MonthTotals[]
+  top_products: { product_id: number; name: string; units: number; revenue: Money }[]
+  new_customers_by_source: { source: string; customers: number }[]
+  low_stock: {
+    product_id: number
+    name: string
+    quantity: number
+    sold_last_30_days: number
+    days_left: number | null
+  }[]
 }

@@ -11,8 +11,8 @@ def create_order(session: Session, order_data: Order) -> Order:
     return order_data
 
 
-def get_order(session: Session, order_id: int) -> Order | None:
-    return session.get(Order, order_id)
+def get_order(session: Session, order_id: int, for_update: bool = False) -> Order | None:
+    return session.get(Order, order_id, with_for_update=for_update)
 
 
 def get_orders(session: Session, offset: int = 0, limit: int = 100) -> list[Order]:

@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import { Spinner } from './components/ui'
 import { useAuth } from './lib/auth'
 import Clients from './pages/Clients'
+import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Messages from './pages/Messages'
 import Orders from './pages/Orders'
@@ -18,12 +19,13 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Navigate to="/clients" replace />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/inventory" element={<Products />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/messages" element={<Messages />} />
-        <Route path="*" element={<Navigate to="/clients" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>
   )

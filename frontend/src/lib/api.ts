@@ -1,4 +1,5 @@
 import type {
+  AnalyticsSummary,
   BroadcastResult,
   Client,
   ClientInput,
@@ -135,6 +136,7 @@ export const api = {
     create: (payload: { client_id?: number; client?: Omit<ClientInput, 'password'>; products: { product_id: number; quantity: number }[] }) =>
       json<Order>('/orders/', { method: 'POST', body: body(payload) }),
     remove: (id: number) => json<{ id: number }>(`/orders/${id}`, { method: 'DELETE' }),
+    cancel: (id: number) => json<Order>(`/orders/${id}/cancel`, { method: 'POST' }),
     items: (id: number) => json<OrderItem[]>(`/orders/${id}/items`),
   },
 
@@ -154,6 +156,11 @@ export const api = {
       link.remove()
       URL.revokeObjectURL(url)
     },
+  },
+
+  analytics: {
+    summary: (start: string, end: string) =>
+      json<AnalyticsSummary>(`/analytics/summary${query({ start, end })}`),
   },
 
   messages: {

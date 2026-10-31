@@ -32,6 +32,7 @@ class OrderBase(SQLModel):
 class OrderRead(OrderBase):
     id: int
     created_at: datetime
+    cancelled_at: datetime | None = None
 
 
 class OrderUpdate(SQLModel):

@@ -9,6 +9,7 @@ from .client_service import (
 )
 from .order_service import (
     add_item_to_order_service,
+    cancel_order_service,
     create_order_product_service,
     create_order_service,
     delete_order_product_service,
@@ -28,6 +29,7 @@ from .product_service import (
 
 __all__ = [
     "add_item_to_order_service",
+    "cancel_order_service",
     "create_order_product_service",
     "create_order_service",
     "delete_client_service",
